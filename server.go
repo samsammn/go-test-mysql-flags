@@ -35,9 +35,22 @@ func appRun() {
 	userController := controller.NewUserController(userRepo)
 
 	app := router.NewHttpRouter()
+	app.Logger(true)
+	app.Cors(true)
 
-	app.GET("/users", userController.FindAll)
-	app.POST("/user", userController.Store)
+	app.POST("/login", userController.Login)
+	app.POST("/logout", userController.Logout)
+
+	app.GROUP("/user", router.Group{
+		GET:  userController.FindAll,
+		POST: userController.Store,
+	})
+
+	app.GROUP("/user/{id}", router.Group{
+		GET:    userController.FindById,
+		PUT:    userController.Update,
+		DELETE: userController.Delete,
+	})
 
 	app.SERVE(":8888")
 }
